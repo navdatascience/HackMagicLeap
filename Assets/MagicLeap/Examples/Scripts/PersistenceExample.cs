@@ -433,6 +433,7 @@ namespace MagicLeap
             List<MLContentBinding> allBindings = MLPersistentStore.AllBindings;
             foreach (MLContentBinding binding in allBindings)
             {
+
                 GameObject gameObj = Instantiate(_content, Vector3.zero, Quaternion.identity);
                 MLPersistentBehavior persistentBehavior = gameObj.GetComponent<MLPersistentBehavior>();
                 persistentBehavior.UniqueId = binding.ObjectId;

@@ -89,6 +89,11 @@ public class AttentionNode : MonoBehaviour
 
     private void UpdateView()
     {
+        if(PlayerController.Instance == null)
+        {
+            return;
+        }
+
         var shouldCull = (Vector3.Distance(this.transform.position, PlayerController.Instance.transform.position) > CULL_DISTANCE);
 
         m_text.text = $"Urgency: {m_urgency:0.00}";
