@@ -25,25 +25,25 @@ public class AttentionDisplay : MonoBehaviour
         float OVERFLOW_MULTIPLIER = 1.2f;
 
         var nodes = AttentionNode.AttentionNodes;
-        float highestStrength = float.MinValue;
-        for(int i = 0; i < nodes.Count; i++)
+        float totalStrength = 0;
+        for (int i = 0; i < nodes.Count; i++)
         {
             var nodePositionXYNormalized = new Vector2(nodes[i].transform.position.x, nodes[i].transform.position.z);
-            var selfPositionXYNormalized = new Vector2(transform.position.x,  transform.position.z);
+            var selfPositionXYNormalized = new Vector2(transform.position.x, transform.position.z);
 
             var distance = Vector2.Distance(nodePositionXYNormalized, selfPositionXYNormalized);
             var urgency = nodes[i].Urgency;
-            var strength = Mathf.Clamp01(urgency * Mathf.Clamp((MAX_DISTANCE - distance), 0, MAX_DISTANCE)/MAX_DISTANCE);
+            var strength = Mathf.Clamp01(urgency * Mathf.Clamp((MAX_DISTANCE - distance), 0, MAX_DISTANCE) / MAX_DISTANCE);
 
-            if(strength > highestStrength)
+            if (strength > 0)
             {
-                highestStrength = strength * OVERFLOW_MULTIPLIER;
+                totalStrength += strength * OVERFLOW_MULTIPLIER;
             }
         }
 
-        if(highestStrength > 0.05)
+        if (totalStrength > 0.05)
         {
-            m_materialCopy.color = Color.HSVToRGB(Mathf.Lerp(BLUE, RED, highestStrength), 1, 1);
+            m_materialCopy.color = Color.HSVToRGB(Mathf.Lerp(BLUE, RED, Mathf.Clamp01(totalStrength)), 1, 1);
         }
         else
         {

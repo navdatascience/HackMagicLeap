@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     private static PlayerController s_playerController;
 
-    public static PlayerController PlayerConstoller
+    public static PlayerController Instance
     {
         get { return s_playerController; }
     }

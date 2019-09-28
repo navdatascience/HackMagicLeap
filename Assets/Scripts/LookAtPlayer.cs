@@ -7,9 +7,9 @@ public class LookAtPlayer : MonoBehaviour
 
     void Update()
     {
-        if (PlayerController.PlayerConstoller != null)
+        if (PlayerController.Instance != null)
         {
-            transform.LookAt(PlayerController.PlayerConstoller.transform);
+            transform.LookAt(PlayerController.Instance.transform);
         }
     }
 }
