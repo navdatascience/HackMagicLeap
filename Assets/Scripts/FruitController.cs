@@ -5,7 +5,7 @@ using UnityEngine;
 public class FruitController : MonoBehaviour
 {
     [SerializeField]
-    private List<Fruit> m_fruits;
+    private List<Fruit> m_fruits = null;
 
     private static FruitController s_fruitController;
 

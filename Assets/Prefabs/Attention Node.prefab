@@ -394,7 +394,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 443bc781fba6f4c49add056108f6303c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_urgency: 0.5
   m_text: {fileID: 4411652515561259910}
   m_template: {fileID: 5924969862663951624}
   m_redTemplate: {fileID: 2800000, guid: 1c42035c96bccd240af11ad12a5aa9f9, type: 3}
@@ -407,6 +406,7 @@ MonoBehaviour:
   m_objectsCanCull: {fileID: 1291779175427945281}
   m_displayName: {fileID: 3303751586415483139}
   m_displayImage: {fileID: 8321211923846329705}
+  m_quantityLabel: {fileID: 4754201251709103327}
   m_fruitString: FILL ME IN
 --- !u!1 &3856745185439090608
 GameObject:

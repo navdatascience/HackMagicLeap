@@ -7,7 +7,7 @@ public class AttentionDisplay : MonoBehaviour
 
 
     [SerializeField]
-    private MeshRenderer m_renderer;
+    private MeshRenderer m_renderer = null;
 
     private Material m_materialCopy;
 
