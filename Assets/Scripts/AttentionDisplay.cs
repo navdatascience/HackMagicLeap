@@ -35,7 +35,7 @@ public class AttentionDisplay : MonoBehaviour
             var distance = Vector2.Distance(nodePositionXYNormalized, selfPositionXYNormalized);
             var urgency = nodes[i].Urgency;
             var strength = Mathf.Clamp01(urgency * Mathf.Clamp((MAX_DISTANCE - distance), 0, MAX_DISTANCE)/MAX_DISTANCE);
-            Debug.Log($"Distance to node: {distance} ");
+
             if(strength > highestStrength)
             {
                 highestStrength = strength * OVERFLOW_MULTIPLIER;
