@@ -9,6 +9,9 @@ public class AttentionNode : MonoBehaviour
     [SerializeField]
     private float m_urgency = 1;
 
+    [SerializeField]
+    private TextMesh m_text;
+
     public float Urgency
     {
         get { return m_urgency; }
@@ -23,5 +26,10 @@ public class AttentionNode : MonoBehaviour
     {
         s_attentionNodes.Add(this);
         Debug.Log($"Nodes: {s_attentionNodes.Count}");
+    }
+
+    private void Update()
+    {
+        m_text.text = $"Urgency: {m_urgency:0.00}";
     }
 }

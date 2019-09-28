@@ -4,8 +4,7 @@ using UnityEngine;
 
 public class AttentionDisplay : MonoBehaviour
 {
-    [SerializeField]
-    private TextMesh m_text;
+
 
     [SerializeField]
     private MeshRenderer m_renderer;
@@ -51,6 +50,6 @@ public class AttentionDisplay : MonoBehaviour
             m_materialCopy.color = Color.HSVToRGB(0f, 0f, 0.5f);
         }
 
-        m_text.text = $"{highestStrength:0.00}";
+
     }
 }
