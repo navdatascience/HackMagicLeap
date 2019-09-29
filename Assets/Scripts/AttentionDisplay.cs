@@ -41,9 +41,11 @@ public class AttentionDisplay : MonoBehaviour
             }
         }
 
+        totalStrength = totalStrength / 1.5f;
+
         if (totalStrength > 0.05)
         {
-            m_materialCopy.color = Color.HSVToRGB(Mathf.Lerp(BLUE, RED, Mathf.Clamp01(totalStrength)), 1, 1);
+            m_materialCopy.color = Color.HSVToRGB(Mathf.Lerp(BLUE, RED, Mathf.Clamp01(totalStrength)), 1, 0.9f);
         }
         else
         {

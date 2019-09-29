@@ -12,7 +12,13 @@ public class GenericButton : MonoBehaviour
     [SerializeField]
     private SphereCollider m_collider = null;
 
+    [SerializeField]
+    private float m_worldSpaceRadius = 0.08f;
+
     private bool m_buttonIsDown = false;
+
+    public bool IsIntersecting = default;
+    public bool IsInteractingAndButtonDown = default;
 
     public void DestroySelf()
     {
@@ -35,9 +41,13 @@ public class GenericButton : MonoBehaviour
 
         var buttonIsDown = false;
 
-        if (PlayerController.Instance.Controller.ConnectedController.TriggerValue > 0.5f && distanceToController < m_collider.radius)
+        IsIntersecting = distanceToController < m_worldSpaceRadius;
+        IsInteractingAndButtonDown = false;
+
+        if (PlayerController.Instance.Controller.ConnectedController.TriggerValue > 0.5f && distanceToController < m_worldSpaceRadius)
         {
             buttonIsDown = true;
+            IsInteractingAndButtonDown = true;
         }
 
         if (buttonIsDown != m_buttonIsDown)
@@ -53,7 +63,5 @@ public class GenericButton : MonoBehaviour
 
             m_buttonIsDown = buttonIsDown;
         }
-
-
     }
 }

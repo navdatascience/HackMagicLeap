@@ -14,7 +14,8 @@ public class InventoryController : MonoBehaviour
     //private string InvData1 = "http://balak.it/testdata.json";
 
     private Inventory m_currentInventory;
-    private float RANDOM_FRACTION_PER_FRAME = 0.01f;
+    private float RANDOM_FRACTION_PER_FRAME = 0.0005f;
+    private Coroutine m_decrementFruitCoroutine = null;
 
     public Inventory CurrentInventory
     {
@@ -29,6 +30,11 @@ public class InventoryController : MonoBehaviour
         yield return GetInventoryFromWeb();
     }
 
+    public void RefreshAllData()
+    {
+        StartCoroutine(GetInventoryFromWeb());
+    }
+
     public Crate GetCrateForFruit(string inputFruit)
     {
         if (m_currentInventory == null || m_currentInventory.Crates == null)
@@ -36,20 +42,25 @@ public class InventoryController : MonoBehaviour
             return null;
         }
 
+        Crate currentCrate = null;
+
         for (int i = 0; i < m_currentInventory.Crates.Length; i++)
         {
-            if (inputFruit == m_currentInventory.Crates[i].ItemName)
+            if (inputFruit == m_currentInventory.Crates[i].item_name)
             {
-                return m_currentInventory.Crates[i];
+                if(currentCrate == null || currentCrate.id < m_currentInventory.Crates[i].id)
+                {
+                    currentCrate = m_currentInventory.Crates[i];
+                }
             }
         }
 
-        return null;
+        return currentCrate;
     }
 
     IEnumerator GetInventoryFromWeb()
     {
-        UnityWebRequest getData = UnityWebRequest.Get("http://balak.it/testdata.json");
+        UnityWebRequest getData = UnityWebRequest.Get("http://192.168.2.253:8000/food/api/food/?format=json");
         yield return getData.SendWebRequest();
 
         if (getData.isNetworkError || getData.isHttpError)
@@ -61,14 +72,14 @@ public class InventoryController : MonoBehaviour
             // Show results as text
             var jsonData = getData.downloadHandler.text;
 
-            m_currentInventory = JsonUtility.FromJson<Inventory>(jsonData);
+            m_currentInventory = JsonUtility.FromJson<Inventory>("{\"Crates\":"+jsonData+"}");
         }
 
     }
 
     public void Update()
     {
-        RandomlyDecrementFruits();
+        //RandomlyDecrementFruits();
     }
 
     private void RandomlyDecrementFruits()
@@ -78,16 +89,51 @@ public class InventoryController : MonoBehaviour
 
             for (int i = 0; i < m_currentInventory.Crates.Length; i++)
             {
-                if (UnityEngine.Random.Range(0f, 1f) < RANDOM_FRACTION_PER_FRAME)
+                if (UnityEngine.Random.Range(0f, 1f) < RANDOM_FRACTION_PER_FRAME && m_decrementFruitCoroutine == null)
                 {
 
-                    if (m_currentInventory.Crates[i].Quantity > 0)
+                    if (m_currentInventory.Crates[i].quantity > 0)
                     {
-                        m_currentInventory.Crates[i].Quantity -= 1;
+                        m_decrementFruitCoroutine = StartCoroutine(DecrementAFruit(m_currentInventory.Crates[i].item_name));
                     }
                 }
             }
         }
+
+        
+    }
+
+    private IEnumerator DecrementAFruit(string fruitName)
+    {
+        var foundCrate = GetCrateForFruit(fruitName);
+
+        WWWForm newData = new WWWForm();
+        newData.AddField("crate_id", foundCrate.crate_id);
+        newData.AddField("item_name", foundCrate.item_name);
+        newData.AddField("quantity", (int)Mathf.Clamp(foundCrate.quantity-1, 0, float.MaxValue));
+
+        //expiration time should be 5hr+old expiration time
+        var expirationTimeDelta = foundCrate.ExpirationDatetime - (DateTime.UtcNow.AddSeconds(13));
+
+        newData.AddField("expiration_hours", (int)expirationTimeDelta.TotalHours); // somehow keep the same
+        newData.AddField("expiration_minutes", expirationTimeDelta.Minutes);
+
+
+        UnityWebRequest getData = UnityWebRequest.Post("http://192.168.2.253:8000/food/api/food/?format=api", newData);
+        yield return getData.SendWebRequest();
+
+        if (getData.isNetworkError || getData.isHttpError)
+        {
+            Debug.Log(getData.error);
+        }
+        else
+        {
+            Debug.Log("Success updating inventory");
+        }
+
+        // then update the data
+        m_decrementFruitCoroutine = null;
+        InventoryController.Instance.RefreshAllData();
     }
 }
 
@@ -100,27 +146,21 @@ public class Inventory
 [Serializable]
 public class Crate
 {
-    public int CrateID = 0;
-    public string ItemName = "a";
-    public int Quantity = 1;
-    public string LastStockDate = "b";
-    public string LastStockTime = "default";
-    public string ExpirationDate = "default";
-    public string ExpirationTime = "default";
+    public int id = 0;
+    public int crate_id = 0;
+    public string item_name = "a";
+    public int quantity = 1;
+    public string last_stock_datetime = "default";
+    public string expiration_datetime = "default";
 
     public DateTime LastStockDatetime
     {
-        get { return ParseDateTime(LastStockDate, LastStockTime); }
+        get { return Convert.ToDateTime(last_stock_datetime); }
     }
 
     public DateTime ExpirationDatetime
     {
-        get { return ParseDateTime(ExpirationDate, ExpirationTime); }
-    }
-
-    private DateTime ParseDateTime(string date, string time)
-    {
-        return Convert.ToDateTime(date + " " + time);
+        get { return Convert.ToDateTime(expiration_datetime); } // RPB: the -5f hours is to account for a db bug
     }
 
 }
