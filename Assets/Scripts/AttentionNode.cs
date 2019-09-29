@@ -122,29 +122,32 @@ public class AttentionNode : MonoBehaviour
 
         UpdateView();
 
-        var timeUntilExpiration = m_cachedCrate.ExpirationDatetime - DateTime.Now;
-
-        if(timeUntilExpiration.TotalMinutes < 0f)
+        if (m_cachedCrate != null)
         {
-            // it is expired
-            m_timeToExpirationLabel.text = $"{-timeUntilExpiration.TotalMinutes:0}m";
-            m_timeToExpirationLabel2.text = $"Expired";
-        }
-        else
-        {
-            // it is ticking
-            m_timeToExpirationLabel.text = $"{timeUntilExpiration.TotalMinutes:0} min";
-            m_timeToExpirationLabel2.text = $"To Expiration";
-        }
+            var timeUntilExpiration = m_cachedCrate.ExpirationDatetime - DateTime.Now;
 
-        var timeUrgency = 0f;
+            if (timeUntilExpiration.TotalMinutes < 0f)
+            {
+                // it is expired
+                m_timeToExpirationLabel.text = $"{-timeUntilExpiration.TotalMinutes:0}m";
+                m_timeToExpirationLabel2.text = $"Expired";
+            }
+            else
+            {
+                // it is ticking
+                m_timeToExpirationLabel.text = $"{timeUntilExpiration.TotalMinutes:0} min";
+                m_timeToExpirationLabel2.text = $"To Expiration";
+            }
 
-        if (timeUntilExpiration.TotalMinutes < 60f)
-        {
-            timeUrgency = 1 - (float)timeUntilExpiration.TotalMinutes / 60f;
+            var timeUrgency = 0f;
+
+            if (timeUntilExpiration.TotalMinutes < 60f)
+            {
+                timeUrgency = 1 - (float)timeUntilExpiration.TotalMinutes / 60f;
+            }
+
+            m_timeUrgencyForFrame = timeUrgency;
         }
-
-        m_timeUrgencyForFrame = timeUrgency;
 
     }
 
