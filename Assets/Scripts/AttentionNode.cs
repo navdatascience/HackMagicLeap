@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -58,8 +59,16 @@ public class AttentionNode : MonoBehaviour
     [SerializeField]
     private string m_fruitString = "FILL ME IN";
 
+    [SerializeField]
+    private Text m_timeToExpirationLabel = null;
+
+    [SerializeField]
+    private Text m_timeToExpirationLabel2 = null;
+
     private bool m_previousShouldCull = false;
     private Crate m_cachedCrate = null;
+
+    private float m_timeUrgencyForFrame = 0f;
 
     public float Urgency
     {
@@ -67,12 +76,26 @@ public class AttentionNode : MonoBehaviour
         {
             if (m_cachedCrate != null)
             {
-                return Mathf.Clamp01(((float)HEALTHY_STOCK_QUANTITY - (float)m_cachedCrate.Quantity) / (float)HEALTHY_STOCK_QUANTITY);
+                var quantityUrgency = Mathf.Clamp01(((float)HEALTHY_STOCK_QUANTITY - (float)m_cachedCrate.Quantity) / (float)HEALTHY_STOCK_QUANTITY);
+
+                
+
+                //Debug.LogError($"time till expiration: {timeUntilExpiration.TotalMinutes}");
+
+                if(m_timeUrgencyForFrame > quantityUrgency)
+                {
+                    return m_timeUrgencyForFrame;
+                }
+                else
+                {
+                    return quantityUrgency;
+                }
             }
             else
             {
                 return 0f;
             }
+
         }
     }
 
@@ -98,6 +121,30 @@ public class AttentionNode : MonoBehaviour
         }
 
         UpdateView();
+
+        var timeUntilExpiration = m_cachedCrate.ExpirationDatetime - DateTime.Now;
+
+        if(timeUntilExpiration.TotalMinutes < 0f)
+        {
+            // it is expired
+            m_timeToExpirationLabel.text = $"{-timeUntilExpiration.TotalMinutes:0}m";
+            m_timeToExpirationLabel2.text = $"Expired";
+        }
+        else
+        {
+            // it is ticking
+            m_timeToExpirationLabel.text = $"{timeUntilExpiration.TotalMinutes:0} min";
+            m_timeToExpirationLabel2.text = $"To Expiration";
+        }
+
+        var timeUrgency = 0f;
+
+        if (timeUntilExpiration.TotalMinutes < 60f)
+        {
+            timeUrgency = 1 - (float)timeUntilExpiration.TotalMinutes / 60f;
+        }
+
+        m_timeUrgencyForFrame = timeUrgency;
 
     }
 

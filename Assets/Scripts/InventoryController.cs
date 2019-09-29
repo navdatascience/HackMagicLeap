@@ -63,6 +63,7 @@ public class InventoryController : MonoBehaviour
 
             m_currentInventory = JsonUtility.FromJson<Inventory>(jsonData);
         }
+
     }
 
     public void Update()
@@ -106,5 +107,20 @@ public class Crate
     public string LastStockTime = "default";
     public string ExpirationDate = "default";
     public string ExpirationTime = "default";
+
+    public DateTime LastStockDatetime
+    {
+        get { return ParseDateTime(LastStockDate, LastStockTime); }
+    }
+
+    public DateTime ExpirationDatetime
+    {
+        get { return ParseDateTime(ExpirationDate, ExpirationTime); }
+    }
+
+    private DateTime ParseDateTime(string date, string time)
+    {
+        return Convert.ToDateTime(date + " " + time);
+    }
 
 }
